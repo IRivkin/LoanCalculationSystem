@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  loancalculationsystemdb:
+    image: postgres
+
+  createtestdata:
+    image: ${DOCKER_REGISTRY-}createtestdata
+    build:
+      context: .
+      dockerfile: Services/CreateTestData/Dockerfile
+
+  loancalculator.api:
+    image: ${DOCKER_REGISTRY-}loancalculatorgapi
+    container_name: loancalculator
+    build:
+      context: .
+      dockerfile: Services/LoanCalculator/LoanCalculator.API/Dockerfile
+
+volumes:
+  postgres_loancalculationsystem:
+

@@ -1,0 +1,44 @@
+version: '3.4'
+
+services:
+  loancalculationsystemdb:
+    container_name: loancalculationsystemdb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=LoanCalculationSystemDb
+    restart: always
+    ports:
+        - "5432:5432"
+    volumes:
+      - postgres_loancalculationsystem:/var/lib/postgresql/data/ 
+      
+  createtestdata:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DatabaseLoanCalculationSystem=Server=loancalculationsystemdb;Port=5432;Database=LoanCalculationSystemDb;User Id=postgres;Password=postgres;Include Error Detail=true
+    depends_on:
+      - loancalculationsystemdb
+    ports:
+      - "6002:8882"
+      - "6062:8883"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+  loancalculator.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=8081
+      - ConnectionStrings__DatabaseLoanCalculationSystem=Server=loancalculationsystemdb;Port=5432;Database=LoanCalculationSystemDb;User Id=postgres;Password=postgres;Include Error Detail=true
+    depends_on:
+      - loancalculationsystemdb
+      - createtestdata
+
+    ports:
+      - "6000:8080"
+      - "6060:8081"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
